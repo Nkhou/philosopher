@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/04 16:19:25 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/04 21:31:31 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,21 @@
 
 void	*retune(void *tred)
 {
-	t_philosopher	*tread;
+	t_philosopher	*philo;
 
-	tread = (t_philosopher *) tred;
+	philo = (t_philosopher *) tred;
 	// while (1)
 	// {
-		pthread_mutex_lock(tread->left_fork);
-		pthread_mutex_lock(tread->right_fork);
-		printf("tread %d has taken a fork \n", tread->id);
-		printf("tread %d has taken a fork \n", tread->id);
-		printf("tread %d is is eating \n", tread->id);
-		pthread_mutex_unlock(tread->left_fork);
-		pthread_mutex_unlock(tread->right_fork);
+		pthread_mutex_lock(philo->left_fork);
+		pthread_mutex_lock(philo->right_fork);
+		pthread_mutex_unlock(&philo->data.write);
+		printf("philo %d has taken a fork \n", philo->id);
+		printf("philo %d has taken a fork \n", philo->id);
+		usleep(philo->data.time_to_eat);
+		printf("philo %d is is eating \n", philo->id);
+		pthread_mutex_unlock(&philo->data.write);
+		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
 	// }
 		// exit(1);
 	return (0);
@@ -54,37 +57,43 @@ void	ft_initial(char **argv, int ac, t_philosopher *philo)
 {
 	if (ac == 6)
 		philo->data.num_time_to_eat = ft_atoi(argv[ac - 1]);
-	printf("ha an\n");
 	philo->data.num_philo = ft_atoi(argv[1]);
 	philo->data.num_fork = ft_atoi(argv[1]);
 	philo->data.forks = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t) * philo->data.num_fork);;
-	philo->tread =  malloc(sizeof(pthread_t) * philo->data.num_philo);
 	philo->data.time_to_die = ft_atoi(argv[2]);
 	philo->data.time_to_eat = ft_atoi(argv[3]);
 	philo->data.time_to_sleep = ft_atoi(argv[4]);
-	philo->data.index = 0;
+	philo->left_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+	philo->right_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
 }
 
+void	insial_fork(t_philosopher *philo)
+{
+	int i;
+
+	i = 0;
+	while (i < philo->data.num_fork)
+	{
+		philo[i].left_fork = &philo[i].data.forks[i];
+		philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
+		philo[i].id = i;
+		i++;
+	}
+}
 void philos(t_philosopher *philo)
 {
 	int i;
 
 	i = 0;
-	while (i < philo[i].data.num_philo)
+	insial_fork(philo);
+	while (philo && i < philo[i].data.num_philo)
 	{
-		philo[i].left_fork = &philo[i].data.forks[i];
-		philo[i].right_fork = &philo[i].data.forks[i + 1 % philo[i].data.num_philo];
-		philo[i].id = i;
-		if (pthread_create(&philo[i].tread, NULL, &retune, philo) != 0)
+		if (pthread_create(&philo[i].tread, NULL, &retune, &philo[i]) != 0)
 			ft_error("Error\n");
 		i++;
 	}
-	// while (philo[i].id < 5)
-	// {
-	// 	i++;
-	// }
 	i = 0;
-	while (i < philo[i].data.num_philo)
+	while (philo && i < philo[i].data.num_philo)
 	{
 		if (pthread_join(philo[i].tread, NULL) != 0)
 			ft_error("Error\n");
@@ -101,16 +110,16 @@ int	main(int ac, char **argv)
 		ft_error("Error in number of arguments\n");
 	check_arguments(argv);
 	philo = malloc(sizeof(t_philosopher) * ft_atoi(argv[1]));
-	ft_initial(argv, ac, philo);
 	i = 0;
-	while (i < philo->data.num_fork)
+	while (i < ft_atoi(argv[1]))
 	{
-		pthread_mutex_init(&(philo->data.forks[i]), NULL);
-		// philo[i].left_fork = &philo[i].data.forks[i];
-		// philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
-		// philo[i].id = i;
+		ft_initial(argv, ac, &philo[i]);
 		i++;
 	}
+	i = 0;
+	while (i < philo->data.num_fork)
+		pthread_mutex_init(&(philo->data.forks[i++]), NULL);
+	pthread_mutex_init(&(philo->data.write), NULL);
 	philos(philo);
 	i = 0;
 	while (i++ < philo->data.num_fork)

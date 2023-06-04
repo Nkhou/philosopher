@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/04 16:16:17 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/04 21:29:26 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ typedef struct s_data
 	int			time_to_die;
 	int			time_to_eat;
 	int			time_to_sleep;
-	int			index;
+	// int			index;
 	int			num_time_to_eat;
 	pthread_mutex_t *forks;
-	pthread_mutex_t lock;
+	// pthread_mutex_t lock;
 	pthread_mutex_t write;
 }	t_data;
 
