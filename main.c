@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/04 21:31:31 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/04 21:40:03 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,13 @@ void	*retune(void *tred)
 	// {
 		pthread_mutex_lock(philo->left_fork);
 		pthread_mutex_lock(philo->right_fork);
+		pthread_mutex_lock(&philo->data.write);
+		printf("philo %d has taken a fork \n", philo->id);
+		printf("philo %d has taken a fork \n", philo->id);
 		pthread_mutex_unlock(&philo->data.write);
-		printf("philo %d has taken a fork \n", philo->id);
-		printf("philo %d has taken a fork \n", philo->id);
+		pthread_mutex_lock(&philo->data.write);
 		usleep(philo->data.time_to_eat);
 		printf("philo %d is is eating \n", philo->id);
-		pthread_mutex_unlock(&philo->data.write);
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
 	// }
