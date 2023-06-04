@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/04 14:19:04 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/04 16:19:25 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void	*retune(void *tred)
 	t_philosopher	*tread;
 
 	tread = (t_philosopher *) tred;
-	while (1)
-	{
+	// while (1)
+	// {
 		pthread_mutex_lock(tread->left_fork);
 		pthread_mutex_lock(tread->right_fork);
 		printf("tread %d has taken a fork \n", tread->id);
@@ -26,8 +26,8 @@ void	*retune(void *tred)
 		printf("tread %d is is eating \n", tread->id);
 		pthread_mutex_unlock(tread->left_fork);
 		pthread_mutex_unlock(tread->right_fork);
-		exit(1);
-	}
+	// }
+		// exit(1);
 	return (0);
 }
 
@@ -52,58 +52,68 @@ void	check_arguments(char **argv)
 
 void	ft_initial(char **argv, int ac, t_philosopher *philo)
 {
-	int	i;
-
-	i = 1;
 	if (ac == 6)
 		philo->data.num_time_to_eat = ft_atoi(argv[ac - 1]);
+	printf("ha an\n");
 	philo->data.num_philo = ft_atoi(argv[1]);
 	philo->data.num_fork = ft_atoi(argv[1]);
 	philo->data.forks = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t) * philo->data.num_fork);;
-	philo->data.tread = (pthread_t *) malloc(sizeof(pthread_t) * philo->data.num_philo);
+	philo->tread =  malloc(sizeof(pthread_t) * philo->data.num_philo);
 	philo->data.time_to_die = ft_atoi(argv[2]);
 	philo->data.time_to_eat = ft_atoi(argv[3]);
 	philo->data.time_to_sleep = ft_atoi(argv[4]);
 	philo->data.index = 0;
 }
+
 void philos(t_philosopher *philo)
 {
 	int i;
 
 	i = 0;
-	while (i < philo->data.num_philo)
+	while (i < philo[i].data.num_philo)
 	{
-		philo->left_fork = &philo->data.forks[i];
-		philo->right_fork = &philo->data.forks[i + 1 % philo->data.num_philo];
-		if (pthread_create(&philo->data.tread[i], NULL, &retune, philo) != 0)
+		philo[i].left_fork = &philo[i].data.forks[i];
+		philo[i].right_fork = &philo[i].data.forks[i + 1 % philo[i].data.num_philo];
+		philo[i].id = i;
+		if (pthread_create(&philo[i].tread, NULL, &retune, philo) != 0)
 			ft_error("Error\n");
-		philo->id = i++;
+		i++;
 	}
+	// while (philo[i].id < 5)
+	// {
+	// 	i++;
+	// }
 	i = 0;
-	while (i++ < philo->data.num_philo)
+	while (i < philo[i].data.num_philo)
 	{
-		if (pthread_join(philo->data.tread[i], NULL) != 0)
+		if (pthread_join(philo[i].tread, NULL) != 0)
 			ft_error("Error\n");
+		i++;
 	}
 }
 
 int	main(int ac, char **argv)
 {
-	// t_data	tread;
-	t_philosopher philo;
+	t_philosopher *philo;
 	int i;
 
 	if (ac != 5 && ac != 6)
 		ft_error("Error in number of arguments\n");
 	check_arguments(argv);
-	ft_initial(argv, ac, &philo);
+	philo = malloc(sizeof(t_philosopher) * ft_atoi(argv[1]));
+	ft_initial(argv, ac, philo);
 	i = 0;
-	while (i++ < philo.data.num_fork)
-		pthread_mutex_init(&(philo.data.forks[i]), NULL);
-	philos(&philo);
-	// ft_creat_fork(&tread);
+	while (i < philo->data.num_fork)
+	{
+		pthread_mutex_init(&(philo->data.forks[i]), NULL);
+		// philo[i].left_fork = &philo[i].data.forks[i];
+		// philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
+		// philo[i].id = i;
+		i++;
+	}
+	philos(philo);
 	i = 0;
-	while (i++ < philo.data.num_fork)
-		pthread_mutex_destroy(&philo.data.forks[i]);
+	while (i++ < philo->data.num_fork)
+		pthread_mutex_destroy(&philo->data.forks[i]);
 	return (0);
 }

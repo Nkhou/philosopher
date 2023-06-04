@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/04 14:17:03 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/04 16:16:17 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 
 typedef struct s_data
 {
-	pthread_t	*tread;
 	int			num_philo;
 	int			num_fork;
 	int			time_to_die;
@@ -35,6 +34,7 @@ typedef struct s_data
 typedef struct s_philosopher
 {
 	t_data 		data;
+	pthread_t	tread;
 	int			id;
 	int			num_time_to_eat;
 	int			num_time_was_eat;
