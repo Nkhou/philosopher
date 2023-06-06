@@ -6,30 +6,66 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/04 21:40:03 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/06 11:44:16 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosopher.h"
-
-void	*retune(void *tred)
+void	eating(t_philosopher	*philo)
+{
+		printf("philo %d is eating \n", philo->id - 1);
+		usleep(philo->data.time_to_eat * 1000);
+}
+void	take_fork(t_philosopher	*philo)
+{
+		printf("philo %d has taken a fork \n", philo->id - 1);
+		printf("philo %d has taken a fork \n", philo->id - 1 );
+}
+void	sleeping(t_philosopher	*philo)
+{
+	printf("philo %d is sleeping \n", philo->id - 1);
+	usleep(philo->data.time_to_sleep * 1000);
+}
+void	*routune_philo(void *tred)
 {
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *) tred;
 	// while (1)
 	// {
+		pthread_mutex_lock(&philo->data.write);
+		pthread_mutex_lock(philo->left_fork);
+		pthread_mutex_lock(philo->right_fork);
+		take_fork(philo);
+		eating(philo);
+		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
+		// pthread_mutex_unlock(&philo->data.write);
+		// pthread_mutex_lock(&philo->data.write);
+		sleeping(philo);
+		pthread_mutex_unlock(&philo->data.write);
+	// }
+		// exit(1);
+	return (0);
+}
+void	*routune(void *tred)
+{
+	t_philosopher	*philo;
+
+	philo = (t_philosopher *) tred;
+	// while (1)
+	// {
+		pthread_mutex_lock(&philo->data.write);
+		sleeping(philo);
+		pthread_mutex_unlock(&philo->data.write);
 		pthread_mutex_lock(philo->left_fork);
 		pthread_mutex_lock(philo->right_fork);
 		pthread_mutex_lock(&philo->data.write);
-		printf("philo %d has taken a fork \n", philo->id);
-		printf("philo %d has taken a fork \n", philo->id);
-		pthread_mutex_unlock(&philo->data.write);
-		pthread_mutex_lock(&philo->data.write);
-		usleep(philo->data.time_to_eat);
-		printf("philo %d is is eating \n", philo->id);
+		take_fork(philo);
+		eating(philo);
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
+		pthread_mutex_unlock(&philo->data.write);
 	// }
 		// exit(1);
 	return (0);
@@ -64,8 +100,8 @@ void	ft_initial(char **argv, int ac, t_philosopher *philo)
 	philo->data.time_to_die = ft_atoi(argv[2]);
 	philo->data.time_to_eat = ft_atoi(argv[3]);
 	philo->data.time_to_sleep = ft_atoi(argv[4]);
-	philo->left_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-	philo->right_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+	// philo->left_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+	// philo->right_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
 }
 
 void	insial_fork(t_philosopher *philo)
@@ -77,7 +113,7 @@ void	insial_fork(t_philosopher *philo)
 	{
 		philo[i].left_fork = &philo[i].data.forks[i];
 		philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
-		philo[i].id = i;
+		philo[i].id = i + 1;
 		i++;
 	}
 }
@@ -89,8 +125,16 @@ void philos(t_philosopher *philo)
 	insial_fork(philo);
 	while (philo && i < philo[i].data.num_philo)
 	{
-		if (pthread_create(&philo[i].tread, NULL, &retune, &philo[i]) != 0)
-			ft_error("Error\n");
+		if (philo[i].id % 2 != 0)
+		{
+			if (pthread_create(&philo[i].tread, NULL, &routune_philo, &philo[i]) != 0)
+				ft_error("Error\n");
+		}
+		else
+		{
+			if (pthread_create(&philo[i].tread, NULL, &routune, &philo[i]) != 0)
+				ft_error("Error\n");
+		}
 		i++;
 	}
 	i = 0;
