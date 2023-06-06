@@ -6,15 +6,38 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/06 11:44:16 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/06 20:36:37 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosopher.h"
-void	eating(t_philosopher	*philo)
+
+// long time(){
+// 	long time;
+// 	struct timeval tv;
+
+// 	gettimeofday(&tv, NULL);
+// 	time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+// 	return (time);
+// }
+
+// long ft_time(long start_time++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++){
+// 	//calculate time passed 
+// }
+long get_time(struct timeval time)
 {
-		printf("philo %d is eating \n", philo->id - 1);
-		usleep(philo->data.time_to_eat * 1000);
+	gettimeofday(&time, NULL);
+	return(time.tv_sec *1000 + time.tv_usec / 1000);
+}
+int	eating(t_philosopher	*philo)
+{
+	// struct timeval			time_to_eat_meal;
+	printf("philo %d is eating \n", philo->id - 1);                                                                                                                                                                                       
+		long tmps = get_time(philo[philo->id - 1].time_to_eat_meal);
+		printf("%ld\n", tmps);
+	usleep(philo->data.time_to_eat * 1000);
+// 		return (philo[(philo->id) - 1].time_to_eat_meal.tv_sec + philo[(philo->id) - 1].time_to_eat_meal.tv_usec);
+	return (0);
 }
 void	take_fork(t_philosopher	*philo)
 {

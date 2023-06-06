@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/04 21:29:26 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/06 18:39:13 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stdlib.h>
 # include <pthread.h>
 # include <stdio.h>
+ #include <sys/time.h>
 
 typedef struct s_data
 {
@@ -36,7 +37,7 @@ typedef struct s_philosopher
 	t_data 		data;
 	pthread_t	tread;
 	int			id;
-	int			num_time_to_eat;
+	struct timeval			time_to_eat_meal;
 	int			num_time_was_eat;
 	int			time_to_die;
 	pthread_mutex_t *left_fork;

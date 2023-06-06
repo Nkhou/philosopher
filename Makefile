@@ -1,5 +1,5 @@
 NAME = philo
-CC = cc -Wall -Wextra -Werror
+CC = cc -Wall -Wextra -Werror -g #-fsanitize=address
 SRC = \
 		main.c\
 		ft_error.c\
