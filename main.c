@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/09 17:00:40 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/09 18:51:38 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	eating(t_philosopher	*philo)
 
 	tmp = get_time() - philo->start;
 	printf("%lld ms %d is eating \n", tmp, philo->id);
-	usleep(philo->data.time_to_eat * 1000);
+	ft_usleep(philo->data.time_to_eat);
 	philo[philo->id].time_to_eat_meal =  get_time() - philo->start;
 	return (0);
 }
@@ -45,7 +45,7 @@ void	sleeping(t_philosopher	*philo)
 
 	tmp = get_time() - philo->start;
 	printf("%lld ms %d is sleeping \n", tmp, philo->id);
-	usleep(philo->data.time_to_sleep * 1000);
+	ft_usleep(philo->data.time_to_sleep);
 }
 void	*routune_philo(void *tred)
 {
