@@ -6,47 +6,45 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/06 20:36:37 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/09 17:00:40 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosopher.h"
 
-// long time(){
-// 	long time;
-// 	struct timeval tv;
-
-// 	gettimeofday(&tv, NULL);
-// 	time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-// 	return (time);
-// }
-
-// long ft_time(long start_time++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++){
-// 	//calculate time passed 
-// }
-long get_time(struct timeval time)
+long long	get_time()
 {
+	struct timeval time;
+
 	gettimeofday(&time, NULL);
-	return(time.tv_sec *1000 + time.tv_usec / 1000);
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
+
 int	eating(t_philosopher	*philo)
 {
-	// struct timeval			time_to_eat_meal;
-	printf("philo %d is eating \n", philo->id - 1);                                                                                                                                                                                       
-		long tmps = get_time(philo[philo->id - 1].time_to_eat_meal);
-		printf("%ld\n", tmps);
+	long long	tmp;
+
+	tmp = get_time() - philo->start;
+	printf("%lld ms %d is eating \n", tmp, philo->id);
 	usleep(philo->data.time_to_eat * 1000);
-// 		return (philo[(philo->id) - 1].time_to_eat_meal.tv_sec + philo[(philo->id) - 1].time_to_eat_meal.tv_usec);
+	philo[philo->id].time_to_eat_meal =  get_time() - philo->start;
 	return (0);
 }
+
 void	take_fork(t_philosopher	*philo)
 {
-		printf("philo %d has taken a fork \n", philo->id - 1);
-		printf("philo %d has taken a fork \n", philo->id - 1 );
+	long long	tmp;
+
+	tmp = get_time() - philo->start;
+	printf("%lld ms %d  has taken a fork \n", tmp, philo->id);
 }
+
 void	sleeping(t_philosopher	*philo)
 {
-	printf("philo %d is sleeping \n", philo->id - 1);
+	long long	tmp;
+
+	tmp = get_time() - philo->start;
+	printf("%lld ms %d is sleeping \n", tmp, philo->id);
 	usleep(philo->data.time_to_sleep * 1000);
 }
 void	*routune_philo(void *tred)
@@ -58,11 +56,12 @@ void	*routune_philo(void *tred)
 	// {
 		pthread_mutex_lock(&philo->data.write);
 		pthread_mutex_lock(philo->left_fork);
+		take_fork(philo);
 		pthread_mutex_lock(philo->right_fork);
 		take_fork(philo);
 		eating(philo);
-		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
+		pthread_mutex_unlock(philo->left_fork);
 		// pthread_mutex_unlock(&philo->data.write);
 		// pthread_mutex_lock(&philo->data.write);
 		sleeping(philo);
@@ -123,8 +122,6 @@ void	ft_initial(char **argv, int ac, t_philosopher *philo)
 	philo->data.time_to_die = ft_atoi(argv[2]);
 	philo->data.time_to_eat = ft_atoi(argv[3]);
 	philo->data.time_to_sleep = ft_atoi(argv[4]);
-	// philo->left_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-	// philo->right_fork = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
 }
 
 void	insial_fork(t_philosopher *philo)
@@ -134,12 +131,17 @@ void	insial_fork(t_philosopher *philo)
 	i = 0;
 	while (i < philo->data.num_fork)
 	{
+		philo[i].start = get_time();
 		philo[i].left_fork = &philo[i].data.forks[i];
 		philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
-		philo[i].id = i + 1;
+		philo[i].id = i;
 		i++;
 	}
 }
+// void	*check_philo(void *philo)
+// {
+	
+// }
 void philos(t_philosopher *philo)
 {
 	int i;
@@ -148,7 +150,7 @@ void philos(t_philosopher *philo)
 	insial_fork(philo);
 	while (philo && i < philo[i].data.num_philo)
 	{
-		if (philo[i].id % 2 != 0)
+		if (philo[i].id % 2 == 0)
 		{
 			if (pthread_create(&philo[i].tread, NULL, &routune_philo, &philo[i]) != 0)
 				ft_error("Error\n");
@@ -160,6 +162,8 @@ void philos(t_philosopher *philo)
 		}
 		i++;
 	}
+	// if (pthread_create(&philo[i].tread, NULL, &check_philo, &philo[i]) != 0)
+	// 			ft_error("Error\n");
 	i = 0;
 	while (philo && i < philo[i].data.num_philo)
 	{

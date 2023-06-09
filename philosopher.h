@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/06 18:39:13 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/09 16:34:11 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,9 @@ typedef struct s_philosopher
 	t_data 		data;
 	pthread_t	tread;
 	int			id;
-	struct timeval			time_to_eat_meal;
+	int			time_to_eat_meal;
 	int			num_time_was_eat;
+	long			start;
 	int			time_to_die;
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t *right_fork;
@@ -48,4 +49,6 @@ void	ft_error(char *str);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putchar_fd(char c, int fd);
 int		ft_atoi(const char *str);
+void	ft_usleep(long long time);
+long long	get_time();
 #endif

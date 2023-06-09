@@ -2,6 +2,7 @@
     "files.associations": {
         "__forks_base": "c",
         "unistd.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "locale": "c"
     }
 }

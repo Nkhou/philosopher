@@ -6,6 +6,7 @@ SRC = \
 		ft_putstr.c\
 		ft_putchar.c\
 		ft_atoi.c\
+		ft_usleep.c\
 
 OBJCTS = $(SRC:.c=.o)
 all : $(NAME)
