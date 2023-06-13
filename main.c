@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/13 15:21:23 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/13 17:19:18 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	*routune_philo(void *tred)
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *) tred;
-	while (1)
+	while (philo->num_time_was_eat <= philo->data.num_time_to_eat)
 	{
 		pthread_mutex_lock(&philo->data.write);
 		pthread_mutex_lock(philo->left_fork);
@@ -60,6 +60,7 @@ void	*routune_philo(void *tred)
 		pthread_mutex_lock(philo->right_fork);
 		take_fork(philo);
 		eating(philo);
+		philo->num_time_was_eat = philo->num_time_was_eat + 1;
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		// pthread_mutex_unlock(&philo->data.write);
@@ -75,7 +76,7 @@ void	*routune(void *tred)
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *) tred;
-	while (1)
+	while (philo->num_time_was_eat <= philo->data.num_time_to_eat)
 	{
 		pthread_mutex_lock(&philo->data.write);
 		sleeping(philo);
@@ -85,6 +86,7 @@ void	*routune(void *tred)
 		pthread_mutex_lock(&philo->data.write);
 		take_fork(philo);
 		eating(philo);
+		philo->num_time_was_eat = philo->num_time_was_eat + 1;
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(&philo->data.write);
@@ -116,6 +118,9 @@ void	ft_initial(char **argv, int ac, t_philosopher *philo)
 {
 	if (ac == 6)
 		philo->data.num_time_to_eat = ft_atoi(argv[ac - 1]);
+	else
+		philo->data.num_time_to_eat = 0;
+	philo->num_time_was_eat = 1;
 	philo->data.num_philo = ft_atoi(argv[1]);
 	philo->data.num_fork = ft_atoi(argv[1]);
 	philo->data.forks = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t) * philo->data.num_fork);;
@@ -159,8 +164,7 @@ void philos(t_philosopher *philo)
 		}
 		i++;
 	}
-	// if (pthread_create(&philo[i].tread, NULL, &check_philo, &philo[i]) != 0)
-	// 			ft_error("Error\n");
+	// check_philo(philo);
 	i = 0;
 	while (philo && i < philo[i].data.num_philo)
 	{

@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/09 16:34:11 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/13 17:12:04 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_philosopher
 	int			time_to_eat_meal;
 	int			num_time_was_eat;
 	long			start;
+	int			stop;
 	int			time_to_die;
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t *right_fork;
