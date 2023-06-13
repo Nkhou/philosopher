@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/09 18:51:38 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/13 15:21:23 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ void	*routune_philo(void *tred)
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *) tred;
-	// while (1)
-	// {
+	while (1)
+	{
 		pthread_mutex_lock(&philo->data.write);
 		pthread_mutex_lock(philo->left_fork);
 		take_fork(philo);
@@ -66,7 +66,7 @@ void	*routune_philo(void *tred)
 		// pthread_mutex_lock(&philo->data.write);
 		sleeping(philo);
 		pthread_mutex_unlock(&philo->data.write);
-	// }
+	}
 		// exit(1);
 	return (0);
 }
@@ -75,8 +75,8 @@ void	*routune(void *tred)
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *) tred;
-	// while (1)
-	// {
+	while (1)
+	{
 		pthread_mutex_lock(&philo->data.write);
 		sleeping(philo);
 		pthread_mutex_unlock(&philo->data.write);
@@ -88,7 +88,7 @@ void	*routune(void *tred)
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(&philo->data.write);
-	// }
+	}
 		// exit(1);
 	return (0);
 }
@@ -134,14 +134,11 @@ void	insial_fork(t_philosopher *philo)
 		philo[i].start = get_time();
 		philo[i].left_fork = &philo[i].data.forks[i];
 		philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
-		philo[i].id = i;
+		philo[i].id = i + 1;
 		i++;
 	}
 }
-// void	*check_philo(void *philo)
-// {
-	
-// }
+
 void philos(t_philosopher *philo)
 {
 	int i;
@@ -150,7 +147,7 @@ void philos(t_philosopher *philo)
 	insial_fork(philo);
 	while (philo && i < philo[i].data.num_philo)
 	{
-		if (philo[i].id % 2 == 0)
+		if (philo[i].id % 2 != 0)
 		{
 			if (pthread_create(&philo[i].tread, NULL, &routune_philo, &philo[i]) != 0)
 				ft_error("Error\n");
