@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/13 17:35:19 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/14 15:36:19 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,9 @@ void	*routune_philo(void *tred)
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *) tred;
-			printf("ha ana %d %d \n",philo->num_time_was_eat, philo->data.num_time_to_eat);
-	while (philo->num_time_was_eat <= philo->data.num_time_to_eat)
+	while (philo->num_time_was_eat <= philo->data.num_time_to_eat && philo->stop)
 	{
+		pthread_mutex_lock(&philo->data.lock);
 		pthread_mutex_lock(&philo->data.write);
 		pthread_mutex_lock(philo->left_fork);
 		take_fork(philo);
@@ -69,8 +69,8 @@ void	*routune_philo(void *tred)
 		pthread_mutex_unlock(philo->left_fork);
 		sleeping(philo);
 		pthread_mutex_unlock(&philo->data.write);
+		pthread_mutex_unlock(&philo->data.lock);
 	}
-		// exit(1);
 	return (0);
 }
 void	*routune(void *tred)
@@ -78,9 +78,10 @@ void	*routune(void *tred)
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *) tred;
-	while (philo->num_time_was_eat <= philo->data.num_time_to_eat)
+	while (philo->num_time_was_eat <= philo->data.num_time_to_eat && philo->stop)
 	{
 		pthread_mutex_lock(&philo->data.write);
+		pthread_mutex_lock(&philo->data.lock);
 		sleeping(philo);
 		pthread_mutex_unlock(&philo->data.write);
 		pthread_mutex_lock(philo->left_fork);
@@ -93,8 +94,8 @@ void	*routune(void *tred)
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(&philo->data.write);
+		pthread_mutex_unlock(&philo->data.lock);
 	}
-		// exit(1);
 	return (0);
 }
 
@@ -139,6 +140,7 @@ void	insial_fork(t_philosopher *philo)
 	i = 0;
 	while (i < philo->data.num_fork)
 	{
+		philo[i].time_to_eat_meal = 0;
 		philo[i].start = get_time();
 		philo[i].left_fork = &philo[i].data.forks[i];
 		philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
@@ -148,37 +150,56 @@ void	insial_fork(t_philosopher *philo)
 	}
 }
 
-int	check_philo(t_philosopher *philo)
+void	*check_philo(void *tread)
 {
 	int	i;
+	t_philosopher	*philo;
+	long long	tmp;
 
 	i = 0;
-	while(philo && i < philo[i].data.num_philo && philo[i].stop)
+	philo = (t_philosopher *) tread;
+	pthread_mutex_lock(&philo->data.lock);
+	printf("ha ana\n");
+	exit(1);
+	while (1)
 	{
-		if (philo[i].time_to_eat_meal > philo->time_to_die)
+	// i = 0;
+	while(philo && i < philo[i].data.num_philo)
+	{
+		tmp = get_time() - philo->start;
+		if (tmp - philo[i].time_to_eat_meal > philo->time_to_die)
+		{
 			philo[i].stop = 0;
-		i++;
+		}
+		else
+			i++;
+		printf("ha ana %d  %d %lld %d \n ", philo[i].stop, philo->id, tmp - philo[i].time_to_eat_meal, philo->time_to_die);
 	}
-	if (!philo[i].stop)
-		return (0);
-	i = 0;
-	while (philo && i < philo[i].data.num_philo)
+	if (philo && !philo[i].stop)
 	{
-		if (pthread_join(philo[i].tread, NULL) != 0)
-			ft_error("Error\n");
-		i++;
+		printf("%lld ms %d is die \n", tmp, philo->id);
+		i = 0;
+		while (philo && i < philo[i].data.num_philo )
+		{
+			philo[i].stop = 0;
+			i++;
+		}
+	}
+	pthread_mutex_unlock(&philo->data.lock);
 	}
 	return (0);
 }
 void philos(t_philosopher *philo)
 {
 	int i;
+	pthread_t	check;
 
 	i = 0;
 	insial_fork(philo);
 	while (philo && i < philo[i].data.num_philo)
 	{
-		if (philo[i].id % 2 == 0)
+		
+		if (philo[i].id % 2 != 0)
 		{
 			if (pthread_create(&philo[i].tread, NULL, &routune_philo, &philo[i]) != 0)
 				ft_error("Error\n");
@@ -190,7 +211,23 @@ void philos(t_philosopher *philo)
 		}
 		i++;
 	}
-	check_philo(philo);
+	if (pthread_create(&check, NULL, &check_philo, philo) != 0)
+		ft_error("Error\n");
+	i = 0;
+	while (i <= philo[i].data.num_philo)
+	{
+		// if (i == philo[i].data.num_philo)
+		// {
+			if (pthread_join(philo[i].tread, NULL) != 0)
+				ft_error("Error\n");
+			if (pthread_join(check, NULL) != 0)
+				ft_error("Error\n");
+		// }
+		// else
+		// {
+		// }
+		i++;
+	}
 }
 
 int	main(int ac, char **argv)
@@ -212,9 +249,11 @@ int	main(int ac, char **argv)
 	while (i < philo->data.num_fork)
 		pthread_mutex_init(&(philo->data.forks[i++]), NULL);
 	pthread_mutex_init(&(philo->data.write), NULL);
+	pthread_mutex_init(&(philo->data.lock), NULL);
 	philos(philo);
 	i = 0;
 	while (i++ < philo->data.num_fork)
 		pthread_mutex_destroy(&philo->data.forks[i]);
+	pthread_mutex_destroy(&philo->data.lock);
 	return (0);
 }
