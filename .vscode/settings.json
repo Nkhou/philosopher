@@ -3,6 +3,7 @@
         "__forks_base": "c",
         "unistd.h": "c",
         "stdio.h": "c",
-        "locale": "c"
+        "locale": "c",
+        "chrono": "c"
     }
 }

@@ -77,7 +77,7 @@ void	*routune_philo(void *tred)
 	}
 	return (0);
 }
-void	*routune(void *tred)
+void	*routune(void *tred, void *)
 {
 	t_philosopher	*philo;
 
@@ -150,7 +150,7 @@ void	insial_fork(t_philosopher *philo)
 		philo[i].left_fork = &philo[i].data.forks[i];
 		philo[i].right_fork = &philo[i].data.forks[(i + 1) % philo[i].data.num_philo];
 		philo[i].id = i + 1;
-		philo[i].stop = 1;
+		philo[i].data->stop = 1;
 		i++;
 	}
 }
@@ -172,18 +172,18 @@ void	insial_fork(t_philosopher *philo)
 // 		tmp = get_time() - philo->start;
 // 		if (tmp - philo[i].time_to_eat_meal > philo->time_to_die)
 // 		{
-// 			philo[i].stop = 0;
+// 			philo[i].data->stop = 0;
 // 		}
 // 		else
 // 			i++;
 // 	}
-// 	if (philo && !philo[i].stop)
+// 	if (philo && !philo[i].data->stop)
 // 	{
 // 		printf("%lld ms %d is die \n", tmp, philo->id);
 // 		i = 0;
 // 		while (philo && i < philo[i].data.num_philo )
 // 		{
-// 			philo[i].stop = 0;
+// 			philo[i].data->stop = 0;
 // 			i++;
 // 		}
 // 	}
