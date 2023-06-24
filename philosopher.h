@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/20 22:33:11 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/24 14:11:03 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,24 @@
 # include <stdlib.h>
 # include <pthread.h>
 # include <stdio.h>
+# include <string.h>
  #include <sys/time.h>
+
 typedef struct s_philosopher
 {
 	pthread_t	tread;
 	int			id;
 	int			time_to_eat_meal;
 	int			num_time_was_eat;
-	// int			time_to_die;
-	// int			time_to_eat;
-	// int			time_to_sleep;
 	int			num_time_to_eat;
+	struct s_data *data;
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t *right_fork;
 } t_philosopher;
 
 typedef struct s_data
 {
-	t_philosopher *philo;
+	struct s_philosopher *philo;
 	int			index;
 	int			num_fork;
 	int			time_to_die;
@@ -48,11 +48,12 @@ typedef struct s_data
 	pthread_mutex_t write;
 }	t_data;
 
-// typedef struct s_index
-// {
-// 	t_data *data;
-// 	int index;
-// }t_index;
+typedef struct s_check
+{
+	pthread_t tread;
+	struct s_data *data;
+} t_check;
+
 void	ft_error(char *str);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putchar_fd(char c, int fd);
