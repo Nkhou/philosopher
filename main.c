@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/25 16:44:53 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:50:37 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	*routune_philo(void *tred)
 	data = philo->data;
 	while ((philo->num_time_was_eat < data->num_time_to_eat || data->num_time_to_eat == 0) && data->stop)
 	{
-		if (!(philo->num_time_was_eat < data->num_time_to_eat || data->num_time_to_eat == 0))
+		if (!(philo->num_time_was_eat < data->num_time_to_eat ||( data->num_time_to_eat == -1)))
 			return (0);
 		pthread_mutex_lock(philo->left_fork);
 		if (data->stop)
@@ -117,7 +117,7 @@ void	ft_initial(char **argv, int ac, t_data *data)
 	if (ac == 6)
 		data->num_time_to_eat = ft_atoi(argv[ac - 1]);
 	else
-		data->num_time_to_eat = 0;
+		data->num_time_to_eat = -1;
 	data->num_philo = ft_atoi(argv[1]);
 	data->num_fork = ft_atoi(argv[1]);
 	data->philo = (t_philosopher *) malloc(sizeof(t_philosopher) * data->num_philo);
