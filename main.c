@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/25 11:44:55 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:04:46 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,18 @@ void	*routune_philo(void *tred)
 		pthread_mutex_lock(philo->left_fork);
 		if (data->stop)
 			take_fork(philo);
+		else
+			pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_lock(philo->right_fork);
 		if (data->stop)
 		{
 			take_fork(philo);
 			eating(philo);
+		}
+		else
+		{
+			pthread_mutex_unlock(philo->left_fork);
+			pthread_mutex_unlock(philo->right_fork);
 		}
 		if (data->num_time_to_eat && data->stop)
 		{
@@ -147,12 +154,13 @@ void	*check_philo(void *tread)
 
 	i = 0;
 	data = (t_data *) tread;
-	while (1)
+	while (data->philo[i].num_time_was_eat <= data->num_time_to_eat)
 	{
 		tmp = get_time();
 		if ((get_time() - data->philo[i].time_to_eat_meal) > (unsigned long)data->time_to_die)
 		{
 			pthread_mutex_lock(&data->lock);
+			pthread_mutex_lock(&data->write);
 			printf("%lu ms %d is die \n", tmp - data->start, data->philo[i].id);
 			data->stop = 0;
 			pthread_mutex_unlock(&data->lock);
@@ -178,10 +186,17 @@ void philos(t_data *data)
 	insial_fork(data);
 	while (i < data->num_philo)
 	{
-		if (data->philo[i].id % 2 == 0 && get_time() == data->start)
+		if (data->philo[i].id % 2 == 0)
+		{
 			usleep(100);
-		if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
-			ft_error("Error\n");
+			if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
+				ft_error("Error\n");
+		}
+		else
+		{
+			if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
+				ft_error("Error\n");
+		}
 		pthread_detach(data->philo[i].tread);
 		i++;
 	}
