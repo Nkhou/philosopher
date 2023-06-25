@@ -6,13 +6,13 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/24 14:22:38 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/25 11:44:55 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosopher.h"
 
-long long	get_time()
+unsigned long	get_time()
 {
 	struct timeval time;
 
@@ -27,12 +27,11 @@ int	eating(t_philosopher	*philo)
 	
 	data = philo->data;
 	tmp = get_time() - data->start;
-	ft_usleep(data->time_to_eat);
-	philo->time_to_eat_meal =  get_time() - data->start;
-	printf("**********%d\n",philo->time_to_eat_meal);
+	philo->time_to_eat_meal =  get_time();
 	pthread_mutex_lock(&data->write);
 	printf("%lld ms %d is eating \n", tmp, philo->id);
 	pthread_mutex_unlock(&data->write);
+	ft_usleep(data->time_to_eat);
 	return (0);
 }
 
@@ -51,10 +50,10 @@ void	sleeping(t_philosopher	*philo)
 	long long	tmp;
 
 	tmp = get_time() - philo->data->start;
-	ft_usleep(philo->data->time_to_sleep);
 	pthread_mutex_lock(&philo->data->write);
 	printf("%lld ms %d is sleeping \n", tmp, philo->id);
 	pthread_mutex_unlock(&philo->data->write);
+	ft_usleep(philo->data->time_to_sleep);
 }
 void	*routune_philo(void *tred)
 {
@@ -85,36 +84,6 @@ void	*routune_philo(void *tred)
 	}
 	return (0);
 }
-void	*routune(void *tred)
-{
-	t_philosopher			*philo;
-	t_data *data;
-
-	philo = (t_philosopher *)tred;
-	data = philo->data;
-	while (philo->num_time_was_eat <= data->num_time_to_eat && data->stop)
-	{
-		if (data->stop)
-			sleeping(philo);
-		pthread_mutex_lock(philo->left_fork);
-		if (data->stop)
-			take_fork(philo);
-		pthread_mutex_lock(philo->right_fork);
-		if (data->stop)
-		{
-			take_fork(philo);
-			eating(philo);
-		}
-		if (data->num_time_to_eat && data->stop)
-		{
-			philo->num_time_was_eat = philo->num_time_was_eat + 1;
-		}
-		pthread_mutex_unlock(philo->right_fork);
-		pthread_mutex_unlock(philo->left_fork);
-	}
-	return (0);
-}
-
 void	check_arguments(char **argv)
 {
 	int	i;
@@ -161,7 +130,7 @@ void	insial_fork(t_data *data)
 	{
 		data->philo[i].data = data;
 		data->philo[i].num_time_was_eat = 0;
-		data->philo[i].time_to_eat_meal = 0;
+		data->philo[i].time_to_eat_meal = get_time();
 		data->philo[i].left_fork = &data->forks[i];
 		data->philo[i].right_fork = &data->forks[(i + 1) % data->num_philo];
 		data->philo[i].id = i + 1;
@@ -173,20 +142,18 @@ void	insial_fork(t_data *data)
 void	*check_philo(void *tread)
 {
 	int	i;
-	t_check	*check;
 	t_data	*data;
-	long long	tmp;
+	unsigned long	tmp;
 
-	i = -1;
-	check = (t_check *) tread;
-	data = check->data;
+	i = 0;
+	data = (t_data *) tread;
 	while (1)
 	{
-		tmp = get_time() - data->start;
-		if ((tmp - data->philo[i].time_to_eat_meal) > data->time_to_die)
+		tmp = get_time();
+		if ((get_time() - data->philo[i].time_to_eat_meal) > (unsigned long)data->time_to_die)
 		{
 			pthread_mutex_lock(&data->lock);
-			printf("%lld ms %d is die \n", tmp, data->philo[data->index].id);
+			printf("%lu ms %d is die \n", tmp - data->start, data->philo[i].id);
 			data->stop = 0;
 			pthread_mutex_unlock(&data->lock);
 			i = 0;
@@ -197,8 +164,8 @@ void	*check_philo(void *tread)
 			}
 			return(NULL);
 		}
-		if (i >= data->num_philo)
-			i = -1;
+		i++;
+		i = i % data->num_philo;
 	}
 	return (0);
 }
@@ -206,7 +173,6 @@ void	*check_philo(void *tread)
 void philos(t_data *data)
 {
 	int i;
-	t_check	check;
 
 	i = 0;
 	insial_fork(data);
@@ -219,11 +185,7 @@ void philos(t_data *data)
 		pthread_detach(data->philo[i].tread);
 		i++;
 	}
-	check.data = data;
-	if (pthread_create(&check.tread, NULL, &check_philo, &check) != 0)
-		ft_error("Error\n");
-	if (pthread_join(check.tread, NULL) != 0)
-			ft_error("Error\n");
+	check_philo(data);
 }
 
 int	main(int ac, char **argv)

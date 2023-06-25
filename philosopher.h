@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/24 14:11:03 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/25 10:57:25 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ typedef struct s_philosopher
 {
 	pthread_t	tread;
 	int			id;
-	int			time_to_eat_meal;
+	unsigned long	time_to_eat_meal;
 	int			num_time_was_eat;
 	int			num_time_to_eat;
 	struct s_data *data;
@@ -34,16 +34,16 @@ typedef struct s_philosopher
 typedef struct s_data
 {
 	struct s_philosopher *philo;
-	int			index;
 	int			num_fork;
 	int			time_to_die;
 	int			time_to_eat;
 	int			time_to_sleep;
 	int			num_philo;
 	int			stop;
-	long		start;
+	unsigned long		start;
 	int			num_time_to_eat;
 	pthread_mutex_t *forks;
+	pthread_mutex_t *meal;
 	pthread_mutex_t lock;
 	pthread_mutex_t write;
 }	t_data;
@@ -58,6 +58,6 @@ void	ft_error(char *str);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putchar_fd(char c, int fd);
 int		ft_atoi(const char *str);
-void	ft_usleep(long long time);
-long long	get_time();
+void	ft_usleep(unsigned long time);
+unsigned long	get_time();
 #endif
