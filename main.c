@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/25 16:04:46 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/25 16:44:53 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,10 @@ void	*routune_philo(void *tred)
 
 	philo = (t_philosopher *)tred;
 	data = philo->data;
-	while (philo->num_time_was_eat <= data->num_time_to_eat && data->stop)
+	while ((philo->num_time_was_eat < data->num_time_to_eat || data->num_time_to_eat == 0) && data->stop)
 	{
+		if (!(philo->num_time_was_eat < data->num_time_to_eat || data->num_time_to_eat == 0))
+			return (0);
 		pthread_mutex_lock(philo->left_fork);
 		if (data->stop)
 			take_fork(philo);
@@ -113,7 +115,7 @@ void	check_arguments(char **argv)
 void	ft_initial(char **argv, int ac, t_data *data)
 {
 	if (ac == 6)
-		data->num_time_to_eat = ft_atoi(argv[ac - 1]) - 1;
+		data->num_time_to_eat = ft_atoi(argv[ac - 1]);
 	else
 		data->num_time_to_eat = 0;
 	data->num_philo = ft_atoi(argv[1]);
@@ -154,7 +156,7 @@ void	*check_philo(void *tread)
 
 	i = 0;
 	data = (t_data *) tread;
-	while (data->philo[i].num_time_was_eat <= data->num_time_to_eat)
+	while (data->philo[i].num_time_was_eat < data->num_time_to_eat)
 	{
 		tmp = get_time();
 		if ((get_time() - data->philo[i].time_to_eat_meal) > (unsigned long)data->time_to_die)
