@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/26 15:00:03 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/26 15:33:21 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,5 +231,15 @@ int	main(int ac, char **argv)
 	while (i < data->num_fork)
 		pthread_mutex_destroy(&data->forks[i++]);
 	pthread_mutex_destroy(&data->lock);
+	pthread_mutex_unlock(&data->write);
+	pthread_mutex_destroy(&data->write);
+	while(i < data->num_fork)
+	{
+		free(&data->forks[i]);
+		i++;
+	}
+	free(data->forks);
+	free(data->philo);
+	free(data);
 	return (0);
 }
