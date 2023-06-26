@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/26 15:33:21 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/26 16:33:56 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,25 @@ unsigned long	get_time()
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
+void	ft_clear(t_data *data)
+{
+	int i;
 
+	i = 0;
+	while (i < data->num_fork)
+		pthread_mutex_destroy(&data->forks[i++]);
+	pthread_mutex_destroy(&data->lock);
+	pthread_mutex_unlock(&data->write);
+	pthread_mutex_destroy(&data->write);
+	while(i < data->num_fork)
+	{
+		free(&data->forks[i]);
+		i++;
+	}
+	free(data->forks);
+	free(data->philo);
+	free(data);
+}
 int	eating(t_philosopher	*philo)
 {
 	long long	tmp;
@@ -29,7 +47,7 @@ int	eating(t_philosopher	*philo)
 	tmp = get_time() - data->start;
 	philo->time_to_eat_meal =  get_time();
 	pthread_mutex_lock(&data->write);
-	printf("%lld ms %d is eating \n", tmp, philo->id);
+	printf("%lld %d is eating \n", tmp, philo->id);
 	pthread_mutex_unlock(&data->write);
 	ft_usleep(data->time_to_eat);
 	return (0);
@@ -41,7 +59,7 @@ void	take_fork(t_philosopher	*philo)
 
 	tmp = get_time() - philo->data->start;
 	pthread_mutex_lock(&philo->data->write);
-	printf("%lld ms %d  has taken a fork \n", tmp, philo->id);
+	printf("%lld %d  has taken a fork \n", tmp, philo->id);
 	pthread_mutex_unlock(&philo->data->write);
 }
 
@@ -51,7 +69,7 @@ void	sleeping(t_philosopher	*philo)
 
 	tmp = get_time() - philo->data->start;
 	pthread_mutex_lock(&philo->data->write);
-	printf("%lld ms %d is sleeping \n", tmp, philo->id);
+	printf("%lld %d is sleeping \n", tmp, philo->id);
 	pthread_mutex_unlock(&philo->data->write);
 	ft_usleep(philo->data->time_to_sleep);
 }
@@ -62,15 +80,21 @@ void	*routune_philo(void *tred)
 
 	philo = (t_philosopher *)tred;
 	data = philo->data;
-	while (data->stop)
+	while (1)
 	{
-		if (!(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1)))
+		if (!(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1) || data->stop))
+		{
+			ft_clear(data);
 			return (0);
+		}
 		pthread_mutex_lock(philo->left_fork);
 		if (data->stop)
 			take_fork(philo);
 		else
+		{
+			ft_clear(data);
 			pthread_mutex_unlock(philo->left_fork);
+		}
 		pthread_mutex_lock(philo->right_fork);
 		if (data->stop)
 		{
@@ -79,6 +103,7 @@ void	*routune_philo(void *tred)
 		}
 		else
 		{
+			ft_clear(data);
 			pthread_mutex_unlock(philo->left_fork);
 			pthread_mutex_unlock(philo->right_fork);
 		}
@@ -144,6 +169,7 @@ void	insial_fork(t_data *data)
 		data->philo[i].right_fork = &data->forks[(i + 1) % data->num_philo];
 		data->philo[i].id = i + 1;
 		data->stop = 1;
+		data->index = 1;
 		i++;
 	}
 }
@@ -165,7 +191,7 @@ void	*check_philo(void *tread)
 		{
 			pthread_mutex_lock(&data->lock);
 			pthread_mutex_lock(&data->write);
-			printf("%lu ms %d is die \n", tmp - data->start, data->philo[i].id);
+			printf("%lu %d is die \n", tmp - data->start, data->philo[i].id);
 			data->stop = 0;
 			pthread_mutex_unlock(&data->lock);
 			i = 0;
@@ -181,6 +207,7 @@ void	*check_philo(void *tread)
 	}
 	return (0);
 }
+
 
 void philos(t_data *data)
 {
@@ -206,9 +233,13 @@ void philos(t_data *data)
 	}
 	check_philo(data);
 }
-
+void tt()
+{
+	system("leaks philo");
+}
 int	main(int ac, char **argv)
 {
+	atexit(tt);
 	t_data *data;
 	int i;
 
@@ -227,19 +258,5 @@ int	main(int ac, char **argv)
 	pthread_mutex_init(&(data->write), NULL);
 	pthread_mutex_init(&(data->lock), NULL);
 	philos(data);
-	i = 0;
-	while (i < data->num_fork)
-		pthread_mutex_destroy(&data->forks[i++]);
-	pthread_mutex_destroy(&data->lock);
-	pthread_mutex_unlock(&data->write);
-	pthread_mutex_destroy(&data->write);
-	while(i < data->num_fork)
-	{
-		free(&data->forks[i]);
-		i++;
-	}
-	free(data->forks);
-	free(data->philo);
-	free(data);
 	return (0);
 }

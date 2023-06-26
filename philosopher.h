@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/25 10:57:25 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/26 16:23:53 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct s_data
 {
 	struct s_philosopher *philo;
 	int			num_fork;
+	int			index;
 	int			time_to_die;
 	int			time_to_eat;
 	int			time_to_sleep;
