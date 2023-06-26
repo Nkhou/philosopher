@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/26 22:43:59 by nkhoudro         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philosopher.h"
 
 unsigned long	get_time()
@@ -18,6 +6,27 @@ unsigned long	get_time()
 
 	gettimeofday(&time, NULL);
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
+}
+
+int	ft_clear(t_data *data)
+{
+	int i;
+
+	i = 0;
+	while (i < data->num_fork)
+		pthread_mutex_destroy(&data->forks[i++]);
+	pthread_mutex_destroy(&data->lock);
+	pthread_mutex_unlock(&data->write);
+	pthread_mutex_destroy(&data->write);
+	while(i < data->num_fork)
+	{
+		free(&data->forks[i]);
+		i++;
+	}
+	free(data->forks);
+	free(data->philo);
+	free(data);
+	return (0);
 }
 
 int	eating(t_philosopher	*philo)
@@ -39,8 +48,8 @@ void	take_fork(t_philosopher	*philo)
 {
 	long long	tmp;
 
-	tmp = get_time() - philo->data->start;
 	pthread_mutex_lock(&philo->data->write);
+	tmp = get_time() - philo->data->start;
 	printf("%lld %d  has taken a fork \n", tmp, philo->id);
 	pthread_mutex_unlock(&philo->data->write);
 }
@@ -49,8 +58,8 @@ void	sleeping(t_philosopher	*philo)
 {
 	long long	tmp;
 
-	tmp = get_time() - philo->data->start;
 	pthread_mutex_lock(&philo->data->write);
+	tmp = get_time() - philo->data->start;
 	printf("%lld %d is sleeping \n", tmp, philo->id);
 	pthread_mutex_unlock(&philo->data->write);
 	ft_usleep(philo->data->time_to_sleep);
@@ -61,13 +70,16 @@ void	*routune_philo(void *tred)
 	t_data *data;
 
 	philo = (t_philosopher *)tred;
+
 	data = philo->data;
-	while (1)
+	while (data->stop)
 	{
-		if (!(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1) || data->stop))
+		if (!data && !(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1)))
 			return (0);
+
+		if (philo->id % 2 == 0 && data->start )
 		pthread_mutex_lock(philo->left_fork);
-		if (data->stop)
+		if (data && data->stop)
 			take_fork(philo);
 		else
 		{
@@ -75,7 +87,7 @@ void	*routune_philo(void *tred)
 			return (0);
 		}
 		pthread_mutex_lock(philo->right_fork);
-		if (data->stop)
+		if (data && data->stop)
 		{
 			take_fork(philo);
 			eating(philo);
@@ -92,7 +104,7 @@ void	*routune_philo(void *tred)
 		}
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
-		if (data->stop)
+		if (data && data->stop)
 			sleeping(philo);
 	}
 	return (0);
@@ -176,7 +188,6 @@ void	insial_fork(t_data *data)
 		data->philo[i].right_fork = &data->forks[(i + 1) % data->num_philo];
 		data->philo[i].id = i + 1;
 		data->stop = 1;
-		data->index = 1;
 		i++;
 	}
 }
@@ -194,27 +205,29 @@ void	*check_philo(void *tread)
 		if (!(data->philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1)))
 			return (0);
 		tmp = get_time();
+		pthread_mutex_lock(&data->lock);
 		if ((get_time() - data->philo[i].time_to_eat_meal) > (unsigned long)data->time_to_die)
 		{
-			pthread_mutex_lock(&data->lock);
 			pthread_mutex_lock(&data->write);
 			printf("%lu %d is die \n", tmp - data->start, data->philo[i].id);
+			pthread_mutex_unlock(&data->write);
 			data->stop = 0;
-			pthread_mutex_unlock(&data->lock);
 			i = 0;
+
 			while (i < data->num_philo)
 			{
 				data->philo[i].data->stop = data->stop;
 				i++;
 			}
+			pthread_mutex_unlock(&data->lock);
 			return(NULL);
 		}
 		i++;
 		i = i % data->num_philo;
+		usleep(100);
 	}
 	return (0);
 }
-
 
 int philos(t_data *data)
 {
@@ -224,65 +237,19 @@ int philos(t_data *data)
 	insial_fork(data);
 	while (i < data->num_philo)
 	{
-		if (data->philo[i].id % 2 == 0)
-		{
-			usleep(100);
-			if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
-				return (0);
-		}
-		else
-		{
-			if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
-				return (0);
-		}
+		if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
+			return (0);
 		pthread_detach(data->philo[i].tread);
 		i++;
 	}
-	check_philo(data);
+	if (check_philo(data) == 0)
+		return (0);
 	return (1);
 }
-int	ft_clear(t_data *data)
-{
-	int i;
 
-	i = 0;
-	while (i < data->num_fork)
-		pthread_mutex_destroy(&data->forks[i++]);
-	pthread_mutex_destroy(&data->lock);
-	pthread_mutex_unlock(&data->write);
-	pthread_mutex_destroy(&data->write);
-	while(i < data->num_fork)
-	{
-		free(&data->forks[i]);
-		i++;
-	}
-	free(data->forks);
-	free(data->philo);
-	free(data);
-	return (0);
-}
-int ft_initial_mutex(t_data *data)
-{
-	int i;
-
-	i = 0;
-	while (i < data->num_fork)
-	{
-		if (!pthread_mutex_init(&(data->forks[i++]), NULL))
-			return (0);
-	}
-		if (!pthread_mutex_init(&(data->write), NULL))
-			return (0);
-		if (!pthread_mutex_init(&(data->lock), NULL))
-			return (0);
-	return (1);
-}
-void tt()
-{
-	system("leaks philo");
-}
 int	main(int ac, char **argv)
 {
+
 	t_data *data;
 
 	if (ac != 5 && ac != 6)
@@ -296,8 +263,9 @@ int	main(int ac, char **argv)
 	ft_initial_mutex(data);
 	if (!ft_initial(argv, ac, data))
 	{
-		if (!ft_clear(data))
-			return (0);
+		free(data->philo);
+		free(data->forks);
+		free(data);
 		return (0);
 	}
 	if (!philos(data))
