@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/26 16:23:53 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 10:59:47 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,4 +61,15 @@ void	ft_putchar_fd(char c, int fd);
 int		ft_atoi(const char *str);
 void	ft_usleep(unsigned long time);
 unsigned long	get_time();
+int	check_arguments(char **argv);
+int check_intial(t_data *data);
+int	ft_initial(char **argv, int ac, t_data *data);
+void	insial_fork(t_data *data);
+int	ft_clear(t_data *data);
+unsigned long	get_time();
+int	eating(t_philosopher	*philo);
+void	take_fork(t_philosopher	*philo);
+void	sleeping(t_philosopher	*philo);
+int check_condition(t_data *data, int i);
+int ft_initial_mutex(t_data *data);
 #endif

@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 15:40:31 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/05/25 15:40:47 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/26 22:47:12 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,5 +15,4 @@
 void	ft_error(char *str)
 {
 	ft_putstr_fd(str, 2);
-	exit(1);
 }

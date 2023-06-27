@@ -1,5 +1,5 @@
 NAME = philo
-CC = cc -Wall -Wextra -Werror
+CC = cc -Wall -Wextra -Werror #-fsanitize=thread
 SRC = \
 		main.c\
 		ft_error.c\
@@ -7,6 +7,8 @@ SRC = \
 		ft_putchar.c\
 		ft_atoi.c\
 		ft_usleep.c\
+		philo_utils.c\
+		routine_utils.c\
 
 OBJCTS = $(SRC:.c=.o)
 all : $(NAME)
