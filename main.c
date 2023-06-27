@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 17:00:33 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 17:22:43 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,17 +86,8 @@ int philos(t_data *data)
 	insial_fork(data);
 	while (i < data->num_philo)
 	{
-		if (data->philo[i].id % 2 == 0)
-		{
-			usleep(100);
-			if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
-				return (0);
-		}
-		else
-		{
-			if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
-				return (0);
-		}
+		if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
+			return (0);
 		pthread_detach(data->philo[i].tread);
 		i++;
 	}

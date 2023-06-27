@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:57:10 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 11:55:53 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 17:21:08 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,13 @@ int ft_initial_mutex(t_data *data)
 	}
 		if (!pthread_mutex_init(&(data->write), NULL))
 			return (0);
+		if (!pthread_mutex_init(&(data->meal), NULL))
+			return (0);
+		if (!pthread_mutex_init(&(data->nb_eat), NULL))
+			return (0);
 		if (!pthread_mutex_init(&(data->lock), NULL))
+			return (0);
+		if (!pthread_mutex_init(&(data->start_m), NULL))
 			return (0);
 	return (1);
 }
@@ -46,14 +52,9 @@ int	eating(t_philosopher	*philo)
 
 void	take_fork(t_philosopher	*philo)
 {
-	// unsigned long	tmp;
-
-	// pthread_mutex_lock(&philo->data->tmp);
-	// tmp = get_time() - philo->data->start;
 	pthread_mutex_lock(&philo->data->write);
 	printf("%lu %d has taken a fork \n", get_time() - philo->data->start, philo->id);
 	pthread_mutex_unlock(&philo->data->write);
-	// pthread_mutex_unlock(&philo->data->tmp);
 }
 
 void	sleeping(t_philosopher	*philo)

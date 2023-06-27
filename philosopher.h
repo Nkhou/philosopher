@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 11:59:30 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 17:21:00 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ typedef struct s_data
 	pthread_mutex_t lock;
 	pthread_mutex_t write;
 	pthread_mutex_t nb_eat;
+	pthread_mutex_t start_m;
 }	t_data;
 
 void	ft_error(char *str);
