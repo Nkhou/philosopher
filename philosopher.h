@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/25 10:57:25 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 11:59:30 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct s_data
 {
 	struct s_philosopher *philo;
 	int			num_fork;
+	int			index;
 	int			time_to_die;
 	int			time_to_eat;
 	int			time_to_sleep;
@@ -43,16 +44,11 @@ typedef struct s_data
 	unsigned long		start;
 	int			num_time_to_eat;
 	pthread_mutex_t *forks;
-	pthread_mutex_t *meal;
+	pthread_mutex_t meal;
 	pthread_mutex_t lock;
 	pthread_mutex_t write;
+	pthread_mutex_t nb_eat;
 }	t_data;
-
-typedef struct s_check
-{
-	pthread_t tread;
-	struct s_data *data;
-} t_check;
 
 void	ft_error(char *str);
 void	ft_putstr_fd(char *s, int fd);
@@ -60,4 +56,17 @@ void	ft_putchar_fd(char c, int fd);
 int		ft_atoi(const char *str);
 void	ft_usleep(unsigned long time);
 unsigned long	get_time();
+int	check_arguments(char **argv);
+int check_intial(t_data *data);
+int	ft_initial(char **argv, int ac, t_data *data);
+void	insial_fork(t_data *data);
+int	ft_clear(t_data *data);
+unsigned long	get_time();
+int	eating(t_philosopher	*philo);
+void	take_fork(t_philosopher	*philo);
+void	sleeping(t_philosopher	*philo);
+int check_condition(t_data *data, int i);
+int ft_initial_mutex(t_data *data);
+int left_fork(t_philosopher *philo);
+int right_fork(t_philosopher *philo);
 #endif
