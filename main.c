@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 11:00:16 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 11:21:47 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,26 +23,10 @@ void	*routune_philo(void *tred)
 	{
 		if (!(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1) || data->stop))
 			return (0);
-		pthread_mutex_lock(philo->left_fork);
-		if (data->stop)
-			take_fork(philo);
-		else
-		{
-			pthread_mutex_unlock(philo->left_fork);
+		if (!left_fork(philo))
 			return (0);
-		}
-		pthread_mutex_lock(philo->right_fork);
-		if (data->stop)
-		{
-			take_fork(philo);
-			eating(philo);
-		}
-		else
-		{
-			pthread_mutex_unlock(philo->left_fork);
-			pthread_mutex_unlock(philo->right_fork);
+		if (!right_fork(philo))
 			return (0);
-		}
 		if (data->num_time_to_eat && data->stop)
 		{
 			philo->num_time_was_eat = philo->num_time_was_eat + 1;
@@ -55,7 +39,7 @@ void	*routune_philo(void *tred)
 	return (0);
 }
 
-void	*check_philo(void *tread)
+int	check_philo(void *tread)
 {
 	int	i;
 	t_data	*data;
@@ -71,7 +55,7 @@ void	*check_philo(void *tread)
 		i++;
 		i = i % data->num_philo;
 	}
-	return (0);
+	return (1);
 }
 
 
@@ -97,7 +81,8 @@ int philos(t_data *data)
 		pthread_detach(data->philo[i].tread);
 		i++;
 	}
-	check_philo(data);
+	if (!check_philo(data))
+		return (0);
 	return (1);
 }
 

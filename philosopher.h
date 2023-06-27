@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 10:59:47 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 11:15:36 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,6 @@ void	take_fork(t_philosopher	*philo);
 void	sleeping(t_philosopher	*philo);
 int check_condition(t_data *data, int i);
 int ft_initial_mutex(t_data *data);
+int left_fork(t_philosopher *philo);
+int right_fork(t_philosopher *philo);
 #endif

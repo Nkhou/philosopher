@@ -9,6 +9,7 @@ SRC = \
 		ft_usleep.c\
 		philo_utils.c\
 		routine_utils.c\
+		right_left.c\
 
 OBJCTS = $(SRC:.c=.o)
 all : $(NAME)
