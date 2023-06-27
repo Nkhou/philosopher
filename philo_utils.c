@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:54:50 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 12:54:02 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 19:44:22 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	check_arguments(char **argv)
 		{
 			if (argv[i][j] < '0' || argv[i][j] > '9')
 			{
-				ft_error("Error in number of arguments\n");
+				ft_error("Error\n");
 				return (0);
 			}
 			j++;
