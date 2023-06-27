@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 17:22:43 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/27 18:35:59 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,27 @@ void	*routune_philo(void *tred)
 	{
 		if ((get_time() - data->start == 0 || get_time() - data->start == 1) && philo->id % 2 == 0)
 			usleep(100);
+		pthread_mutex_lock(&data->nb_eat);
+		pthread_mutex_lock(&data->lock);
 		if (!(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1) || data->stop))
 		{
 			pthread_mutex_unlock(&data->nb_eat);
+			pthread_mutex_lock(&data->lock);
 			return (0);
 		}
-		pthread_mutex_lock(&data->nb_eat);
-			pthread_mutex_unlock(&data->nb_eat);
+		pthread_mutex_unlock(&data->lock);
+		pthread_mutex_unlock(&data->nb_eat);
+		
 		if (!left_fork(philo))
 			return (0);
 		if (!right_fork(philo))
 			return (0);
-		pthread_mutex_lock(&data->lock);
 		pthread_mutex_lock(&data->nb_eat);
 		if (data->num_time_to_eat && data->stop)
 		{
 			philo->num_time_was_eat = philo->num_time_was_eat + 1;
+			pthread_mutex_unlock(&data->nb_eat);
 		}
-		pthread_mutex_unlock(&data->nb_eat);
-		pthread_mutex_unlock(&data->lock);
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_lock(&data->lock);
@@ -111,7 +113,7 @@ int	main(int ac, char **argv)
 	data = (t_data *)malloc(sizeof(t_data) );
 	if (!data)
 		return (0);
-	memset(data,0,sizeof(t_data ));
+	memset(data,0,sizeof(t_data));
 	if (!ft_initial(argv, ac, data))
 	{
 		free(data->forks);
