@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:54:50 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 19:44:22 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 12:21:28 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,11 @@ void	insial_fork(t_data *data)
 	while (i < data->num_fork)
 	{
 		data->philo[i].data = data;
-		pthread_mutex_lock(&data->nb_eat);
+		// pthread_mutex_lock(&data->nb_eat);
 		data->philo[i].num_time_was_eat = 0;
-		pthread_mutex_unlock(&data->nb_eat);
+		// pthread_mutex_lock(&data->meal);
 		data->philo[i].time_to_eat_meal = get_time();
+		// pthread_mutex_unlock(&data->meal);
 		data->philo[i].left_fork = &data->forks[i];
 		data->philo[i].right_fork = &data->forks[(i + 1) % data->num_philo];
 		data->philo[i].id = i + 1;
@@ -103,14 +104,14 @@ void	insial_fork(t_data *data)
 int	ft_clear(t_data *data)
 {
 	int i;
-
 	i = 0;
 	while (i < data->num_fork)
 		pthread_mutex_destroy(&data->forks[i++]);
 	pthread_mutex_destroy(&data->lock);
 	pthread_mutex_destroy(&data->meal);
 	pthread_mutex_destroy(&data->nb_eat);
-	pthread_mutex_unlock(&data->write);
+	// if (!data->stop)
+	pthread_mutex_destroy(&data->start_m);
 	pthread_mutex_destroy(&data->write);
 	while(i < data->num_fork)
 	{

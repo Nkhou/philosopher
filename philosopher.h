@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 17:21:00 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 14:19:09 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_philosopher
 	struct s_data *data;
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t *right_fork;
+	pthread_mutex_t *eat;
 } t_philosopher;
 
 typedef struct s_data
