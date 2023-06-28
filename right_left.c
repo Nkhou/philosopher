@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 11:14:55 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 10:52:33 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 17:32:11 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ int left_fork(t_philosopher *philo)
     pthread_mutex_unlock(&data->lock);
 	return (1);
 }
+
 int right_fork(t_philosopher *philo)
 {
 	t_data *data;

@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 14:19:09 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 17:23:55 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ typedef struct s_philosopher
 	struct s_data *data;
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t *right_fork;
-	pthread_mutex_t *eat;
 } t_philosopher;
 
 typedef struct s_data
@@ -44,6 +43,7 @@ typedef struct s_data
 	int			stop;
 	unsigned long		start;
 	int			num_time_to_eat;
+	pthread_mutex_t eat;
 	pthread_mutex_t *forks;
 	pthread_mutex_t meal;
 	pthread_mutex_t lock;
@@ -65,8 +65,8 @@ void	insial_fork(t_data *data);
 int	ft_clear(t_data *data);
 unsigned long	get_time();
 int	eating(t_philosopher	*philo);
-void	take_fork(t_philosopher	*philo);
-void	sleeping(t_philosopher	*philo);
+int	take_fork(t_philosopher	*philo);
+int	sleeping(t_philosopher	*philo);
 int check_condition(t_data *data, int i);
 int ft_initial_mutex(t_data *data);
 int left_fork(t_philosopher *philo);

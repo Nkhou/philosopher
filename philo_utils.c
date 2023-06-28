@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:54:50 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 12:21:28 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 17:22:14 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,9 @@ int	ft_initial(char **argv, int ac, t_data *data)
 	data->forks = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t) * data->num_fork);
 	if (!data->forks)
 		return(0);
+	// data->eat = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+	// if (!data->eat)
+	// 	return(0);
 	data->time_to_die = ft_atoi(argv[2]);
 	data->time_to_eat = ft_atoi(argv[3]);
 	data->time_to_sleep = ft_atoi(argv[4]);
@@ -84,6 +87,7 @@ void	insial_fork(t_data *data)
 
 	i = 0;
 	data->start = get_time();
+	data->index = 1;
 	while (i < data->num_fork)
 	{
 		data->philo[i].data = data;
@@ -94,6 +98,7 @@ void	insial_fork(t_data *data)
 		// pthread_mutex_unlock(&data->meal);
 		data->philo[i].left_fork = &data->forks[i];
 		data->philo[i].right_fork = &data->forks[(i + 1) % data->num_philo];
+		// data->philo[i].meal = &data->eat[i];
 		data->philo[i].id = i + 1;
 		data->stop = 1;
 		data->index = 1;
