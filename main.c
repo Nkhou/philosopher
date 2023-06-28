@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 12:33:33 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 22:26:19 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	*routune_philo(void *tred)
 	{
 		// pthread_mutex_lock(&data->start_m);
 		if ((get_time() - data->start == 0 || get_time() - data->start == 1) && philo->id % 2 == 0)
-			usleep(100);
+			usleep(60);
 		// pthread_mutex_unlock(&data->start_m);
 		// pthread_mutex_lock(&data->lock);
 		// pthread_mutex_lock(&data->nb_eat);

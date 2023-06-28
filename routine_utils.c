@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:57:10 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 14:26:34 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 22:19:32 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,11 +104,11 @@ int check_condition(t_data *data, int i)
 		pthread_mutex_lock(&data->lock);
 		data->stop = 0;
 		i = 0;
-		// while (i < data->num_philo)
-		// {
-		// 	data->philo[i].data->stop = data->stop;
-		// 	i++;
-		// }
+		while (i < data->num_philo)
+		{
+			data->philo[i].data->stop = data->stop;
+			i++;
+		}
 		pthread_mutex_unlock(&data->lock);
 		return(0);
 	}

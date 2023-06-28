@@ -1,5 +1,5 @@
 NAME = philo
-CC = cc -Wall -Wextra -Werror -fsanitize=thread
+CC = cc -Wall -Wextra -Werror #-fsanitize=thread
 SRC = \
 		main.c\
 		ft_error.c\
