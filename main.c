@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 17:45:04 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 19:52:34 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,28 +25,29 @@ void	*routune_philo(void *tred)
 		if ((get_time() - data->start == 0 || get_time() - data->start == 1) && philo->id % 2 == 0)
 			usleep(70);
 		pthread_mutex_unlock(&data->start_m);
-		// pthread_mutex_lock(&data->lock);
-		// pthread_mutex_lock(&data->nb_eat);
+		pthread_mutex_lock(&data->lock);
+		pthread_mutex_lock(&data->nb_eat);
 		if (!(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1) || data->stop))
 		{
-			// pthread_mutex_unlock(&data->nb_eat);
-			// pthread_mutex_unlock(&data->lock);
+			pthread_mutex_unlock(&data->nb_eat);
+			pthread_mutex_unlock(&data->lock);
 			return (0);
 		}
-			// pthread_mutex_unlock(&data->nb_eat);
-			pthread_mutex_unlock(&data->lock);
+		pthread_mutex_unlock(&data->nb_eat);
+		pthread_mutex_unlock(&data->lock);
 		if (!left_fork(philo))
 			return (0);
 		if (!right_fork(philo))
 			return (0);
 		pthread_mutex_lock(&data->lock);
-		pthread_mutex_lock(&data->nb_eat);
-		if (data->num_time_to_eat && data->stop)
+		if (data->stop)
 		{
+			pthread_mutex_lock(&data->nb_eat);
 			philo->num_time_was_eat = philo->num_time_was_eat + 1;
+			pthread_mutex_unlock(&data->nb_eat);
 		}
-		pthread_mutex_unlock(&data->nb_eat);
 		pthread_mutex_unlock(&data->lock);
+		
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_lock(&data->lock);
@@ -66,12 +67,12 @@ int	check_philo(void *tread)
 	data = (t_data *) tread;
 	while (1)
 	{
-		// pthread_mutex_lock(&data->lock);
+		pthread_mutex_lock(&data->lock);
 		pthread_mutex_lock(&data->nb_eat);
 		if (!(data->philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1) || data->stop))
 		{
 			pthread_mutex_unlock(&data->nb_eat);
-			// pthread_mutex_unlock(&data->lock);
+			pthread_mutex_unlock(&data->lock);
 			return (0);
 		}
 		pthread_mutex_unlock(&data->nb_eat);
@@ -94,7 +95,7 @@ int philos(t_data *data)
 	insial_fork(data);
 	while (i < data->num_philo)
 	{
-		if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
+		if (pthread_create(&(data->philo[i].tread), NULL, &routune_philo, &(data->philo[i])) != 0)
 			return (0);
 		pthread_detach(data->philo[i].tread);
 		i++;

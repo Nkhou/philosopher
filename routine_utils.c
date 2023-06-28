@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:57:10 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 17:41:42 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/06/28 20:23:00 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,12 @@ int ft_print(t_philosopher *philo, int i)
 
 	j = 0;
 	
-			pthread_mutex_lock(&philo->data->meal);
+	pthread_mutex_lock(&philo->data->meal);
+	pthread_mutex_lock(&philo->data->lock);
 	if ((philo->num_time_was_eat < philo->data->num_time_to_eat ||  philo->data->num_time_to_eat == -1) && philo->data->stop)
 	{
-			pthread_mutex_unlock(&philo->data->meal);
+		pthread_mutex_unlock(&philo->data->lock);
+		pthread_mutex_unlock(&philo->data->meal);
 		if (i == 0)
 		{
 			pthread_mutex_lock(&philo->data->eat);
@@ -57,32 +59,39 @@ int ft_print(t_philosopher *philo, int i)
 		}
 		else if (i == 1)
 		{
+			pthread_mutex_lock(&philo->data->start_m);
 			pthread_mutex_lock(&philo->data->write);
 			printf("%lu %d has taken a fork \n", get_time() - philo->data->start, philo->id);
 			pthread_mutex_unlock(&philo->data->write);
+			pthread_mutex_unlock(&philo->data->start_m);
 		}
 		else if (i == 2)
 		{
-			
+			pthread_mutex_lock(&philo->data->start_m);
 			pthread_mutex_lock(&philo->data->write);
 			printf("%lu %d is sleeping \n", get_time() - philo->data->start, philo->id);
 			pthread_mutex_unlock(&philo->data->write);
+			pthread_mutex_unlock(&philo->data->start_m);
 		}
 		else if (i == 3)
 		{
+			pthread_mutex_lock(&philo->data->start_m);
 			pthread_mutex_lock(&philo->data->write);
 			printf("%lu %d is thinking \n", get_time() - philo->data->start, philo->id);
 			pthread_mutex_unlock(&philo->data->write);
-			return (1);
+			pthread_mutex_unlock(&philo->data->start_m);
 		}
 		else
 		{
+			pthread_mutex_lock(&philo->data->start_m);
 			pthread_mutex_lock(&philo->data->write);
 			printf("ha ana\n");
 			printf("%lu %d is die \n", get_time() - philo->data->start, philo->data->philo[i].id);
+			pthread_mutex_unlock(&philo->data->start_m);
 		}
 		return (1);
 	}
+	pthread_mutex_unlock(&philo->data->lock);
 	pthread_mutex_unlock(&philo->data->meal);
 	return(0);
 }
@@ -94,18 +103,18 @@ int	eating(t_philosopher	*philo)
 	pthread_mutex_lock(&data->meal);
 	philo->time_to_eat_meal =  get_time();
 	pthread_mutex_unlock(&data->meal);
-	// pthread_mutex_lock(&data->write);
 	pthread_mutex_lock(&data->start_m);
 	if (!ft_print(philo, 0))
 		return (0);
 	pthread_mutex_unlock(&data->start_m);
-	// pthread_mutex_unlock(&data->write);
 	ft_usleep(data->time_to_eat);
 	return (1);
 }
 
 int	take_fork(t_philosopher	*philo)
 {
+	pthread_mutex_lock(philo->left_fork);
+	pthread_mutex_unlock(&philo->data->lock);
 	if (!ft_print(philo, 1))
 		return (0);
 	return (1);
@@ -115,25 +124,37 @@ int	sleeping(t_philosopher	*philo)
 {
 	pthread_mutex_lock(&philo->data->start_m);
 	if (!ft_print(philo, 2))
+	{
+		pthread_mutex_unlock(&philo->data->start_m);
 		return (0);
+	}
 	pthread_mutex_unlock(&philo->data->start_m);
 	ft_usleep(philo->data->time_to_sleep);
 	pthread_mutex_lock(&philo->data->start_m);
 	if (!ft_print(philo, 3))
+	{
+		pthread_mutex_unlock(&philo->data->start_m);
 		return (0);
+	}
 	pthread_mutex_unlock(&philo->data->start_m);
 	return (1);
 }
-// here i add mutex lock
+
 int check_condition(t_data *data, int i)
 {
 	pthread_mutex_lock(&data->meal);
 	if ((get_time() - data->philo[i].time_to_eat_meal) > (unsigned long)data->time_to_die)
 	{
 		pthread_mutex_unlock(&data->meal);
-		pthread_mutex_lock(&data->start_m);
+		// pthread_mutex_lock(&data->start_m);
 		if (!ft_print(data->philo, 4))
+		{
+			// pthread_mutex_unlock(&data->start_m);
+			pthread_mutex_lock(&data->lock);
+			data->stop = 0;
+			pthread_mutex_unlock(&data->lock);
 			return (0);
+		}
 		pthread_mutex_unlock(&data->start_m);
 		pthread_mutex_lock(&data->lock);
 		data->stop = 0;
