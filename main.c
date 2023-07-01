@@ -6,95 +6,83 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/07/01 14:03:49 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/07/01 14:35:55 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosopher.h"
 
+void	ft_unloc(t_data *data, t_philosopher *philo)
+{
+	pthread_mutex_unlock(&data->nb_eat);
+	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_unlock(philo->left_fork);
+}
+
 void	*routune_philo(void *tred)
 {
 	t_philosopher			*philo;
-	t_data *data;
 
 	philo = (t_philosopher *)tred;
-	data = philo->data;
-	if ((get_time() - data->start == 0 || get_time() - data->start == 1) && philo->id % 2 == 0)
+	if ((get_time() - philo->data->start == 0
+			|| get_time() - philo->data->start == 1) && philo->id % 2 == 0)
 		usleep(100);
 	while (1)
 	{
-		// pthread_mutex_lock(&data->start_m);
-		// pthread_mutex_unlock(&data->start_m);
-		// pthread_mutex_lock(&data->lock);
-		pthread_mutex_lock(&data->nb_eat);
-		if (!(philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1) || data->stop))
+		pthread_mutex_lock(&philo->data->nb_eat);
+		if (!(philo->num_time_was_eat < philo->data->num_time_to_eat
+				|| (philo->data->num_time_to_eat == -1)))
 		{
-			pthread_mutex_unlock(&data->nb_eat);
-			// pthread_mutex_unlock(&data->lock);
+			pthread_mutex_unlock(&philo->data->nb_eat);
 			return (0);
 		}
-			pthread_mutex_unlock(&data->nb_eat);
-			// pthread_mutex_unlock(&data->lock);
-		if (!left_fork(philo))
-			return (0);
-		if (!right_fork(philo))
-			return (0);
-		// pthread_mutex_lock(&data->lock);
-		pthread_mutex_lock(&data->nb_eat);
-		if (data->num_time_to_eat && data->stop)
-		{
+		pthread_mutex_unlock(&philo->data->nb_eat);
+		left_fork(philo);
+		right_fork(philo);
+		pthread_mutex_lock(&philo->data->nb_eat);
+		if (philo->data->num_time_to_eat)
 			philo->num_time_was_eat = philo->num_time_was_eat + 1;
-		}
-		pthread_mutex_unlock(&data->nb_eat);
-		// pthread_mutex_unlock(&data->lock);
-		pthread_mutex_unlock(philo->right_fork);
-		pthread_mutex_unlock(philo->left_fork);
-		// pthread_mutex_lock(&data->lock);
-		if (data->stop)
-			sleeping(philo);
-		// pthread_mutex_unlock(&data->lock);
+		ft_unloc(philo->data, philo);
+		sleeping(philo);
 	}
 	return (0);
 }
 
 int	check_philo(void *tread)
 {
-	int	i;
 	t_data	*data;
+	int		i;
 
 	i = 0;
 	data = (t_data *) tread;
 	while (1)
 	{
-		// pthread_mutex_lock(&data->lock);
 		pthread_mutex_lock(&data->nb_eat);
-		if (!(data->philo->num_time_was_eat < data->num_time_to_eat || ( data->num_time_to_eat == -1)))
+		if (!(data->philo->num_time_was_eat < data->num_time_to_eat
+				|| (data->num_time_to_eat == -1)))
 		{
 			pthread_mutex_unlock(&data->nb_eat);
-			// pthread_mutex_unlock(&data->lock);
 			return (0);
 		}
 		pthread_mutex_unlock(&data->nb_eat);
 		if (!check_condition(data, i))
 			return (0);
-		// pthread_mutex_unlock(&data->lock);
 		i++;
 		i = i % data->num_philo;
-		// usleep(200);
 	}
 	return (1);
 }
 
-
-int philos(t_data *data)
+int	philos(t_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	insial_fork(data);
 	while (i < data->num_philo)
 	{
-		if (pthread_create(&data->philo[i].tread, NULL, &routune_philo, &data->philo[i]) != 0)
+		if (pthread_create(&data->philo[i].tread, NULL,
+				&routune_philo, &data->philo[i]) != 0)
 			return (0);
 		pthread_detach(data->philo[i].tread);
 		i++;
@@ -104,22 +92,18 @@ int philos(t_data *data)
 	return (1);
 }
 
-void tt()
-{
-	system("leaks philo");
-}
 int	main(int ac, char **argv)
 {
-	t_data *data;
+	t_data	*data;
 
 	if (ac != 5 && ac != 6)
 		ft_error("Error in number of arguments\n");
 	if (!check_arguments(argv))
 		return (0);
-	data = (t_data *)malloc(sizeof(t_data) );
+	data = (t_data *) malloc(sizeof(t_data));
 	if (!data)
 		return (0);
-	memset(data,0,sizeof(t_data ));
+	memset(data, 0, sizeof(t_data));
 	if (!ft_initial(argv, ac, data))
 	{
 		free(data->forks);

@@ -6,15 +6,15 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 22:28:37 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/27 12:04:37 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/07/01 14:35:15 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosopher.h"
 
-void ft_initial_mutex(t_data *data)
+void	ft_initial_mutex(t_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < data->num_fork)

@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:54:50 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/06/28 12:21:28 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/07/01 14:39:11 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	check_arguments(char **argv)
 	return (1);
 }
 
-int check_intial(t_data *data)
+int	check_intial(t_data *data)
 {
 	if (data->num_time_to_eat == 0)
 		return (0);
@@ -64,12 +64,14 @@ int	ft_initial(char **argv, int ac, t_data *data)
 		data->num_time_to_eat = -1;
 	data->num_philo = ft_atoi(argv[1]);
 	data->num_fork = ft_atoi(argv[1]);
-	data->philo = (t_philosopher *) malloc(sizeof(t_philosopher) * data->num_philo);
+	data->philo = (t_philosopher *)
+		malloc(sizeof(t_philosopher) * data->num_philo);
 	if (!data->philo)
 		return (0);
-	data->forks = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t) * data->num_fork);
+	data->forks = (pthread_mutex_t *)
+		malloc(sizeof(pthread_mutex_t) * data->num_fork);
 	if (!data->forks)
-		return(0);
+		return (0);
 	data->time_to_die = ft_atoi(argv[2]);
 	data->time_to_eat = ft_atoi(argv[3]);
 	data->time_to_sleep = ft_atoi(argv[4]);
@@ -80,40 +82,33 @@ int	ft_initial(char **argv, int ac, t_data *data)
 
 void	insial_fork(t_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	data->start = get_time();
 	while (i < data->num_fork)
 	{
 		data->philo[i].data = data;
-		// pthread_mutex_lock(&data->nb_eat);
 		data->philo[i].num_time_was_eat = 0;
-		// pthread_mutex_lock(&data->meal);
 		data->philo[i].time_to_eat_meal = get_time();
-		// pthread_mutex_unlock(&data->meal);
 		data->philo[i].left_fork = &data->forks[i];
 		data->philo[i].right_fork = &data->forks[(i + 1) % data->num_philo];
 		data->philo[i].id = i + 1;
-		data->stop = 1;
-		data->index = 1;
 		i++;
 	}
 }
 
 int	ft_clear(t_data *data)
 {
-	int i;
+	int	i;
+
 	i = 0;
 	while (i < data->num_fork)
 		pthread_mutex_destroy(&data->forks[i++]);
-	pthread_mutex_destroy(&data->lock);
 	pthread_mutex_destroy(&data->meal);
 	pthread_mutex_destroy(&data->nb_eat);
-	// if (!data->stop)
-	pthread_mutex_destroy(&data->start_m);
 	pthread_mutex_destroy(&data->write);
-	while(i < data->num_fork)
+	while (i < data->num_fork)
 	{
 		free(&data->forks[i]);
 		i++;
