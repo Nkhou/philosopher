@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:33:28 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/07/01 14:35:55 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/07/02 14:46:38 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,13 +91,17 @@ int	philos(t_data *data)
 		return (0);
 	return (1);
 }
-
+void tt()
+{
+	system("leaks philo");
+}
 int	main(int ac, char **argv)
 {
 	t_data	*data;
 
-	if (ac != 5 && ac != 6)
-		ft_error("Error in number of arguments\n");
+	atexit(tt);
+	if (!check_number(ac))
+		return (0);
 	if (!check_arguments(argv))
 		return (0);
 	data = (t_data *) malloc(sizeof(t_data));

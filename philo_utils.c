@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/27 10:54:50 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/07/01 14:39:11 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/07/02 14:45:47 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,11 @@ int	check_arguments(char **argv)
 	while (argv[i])
 	{
 		j = 0;
+		if (!argv[i][j])
+		{
+			ft_error("Error\n");
+			return (0);
+		}
 		while (argv[i][j])
 		{
 			if (argv[i][j] < '0' || argv[i][j] > '9')
@@ -76,7 +81,10 @@ int	ft_initial(char **argv, int ac, t_data *data)
 	data->time_to_eat = ft_atoi(argv[3]);
 	data->time_to_sleep = ft_atoi(argv[4]);
 	if (!check_intial(data))
+	{
+		ft_error("Error\n");
 		return (0);
+	}
 	return (1);
 }
 
@@ -103,6 +111,7 @@ int	ft_clear(t_data *data)
 	int	i;
 
 	i = 0;
+	ft_usleep(data->time_to_eat + data->time_to_sleep);
 	while (i < data->num_fork)
 		pthread_mutex_destroy(&data->forks[i++]);
 	pthread_mutex_destroy(&data->meal);

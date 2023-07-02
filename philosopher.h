@@ -6,7 +6,7 @@
 /*   By: nkhoudro <nkhoudro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/21 16:35:16 by nkhoudro          #+#    #+#             */
-/*   Updated: 2023/07/01 14:41:13 by nkhoudro         ###   ########.fr       */
+/*   Updated: 2023/07/02 14:43:36 by nkhoudro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,4 +66,6 @@ int				check_condition(t_data *data, int i);
 int				ft_initial_mutex(t_data *data);
 int				left_fork(t_philosopher *philo);
 int				right_fork(t_philosopher *philo);
+int				check_number(int ac);
+
 #endif
