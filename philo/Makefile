@@ -1,5 +1,9 @@
 NAME = philo
+<<<<<<< HEAD:Makefile
 CC = cc -Wall -Wextra -Werror #-fsanitize=thread
+=======
+CC = cc -Wall -Wextra -Werror 
+>>>>>>> temp-branch:philo/Makefile
 SRC = \
 		main.c\
 		ft_error.c\
@@ -26,4 +30,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: fclean clean all re bonus
+.PHONY: fclean clean all re
